@@ -6,15 +6,14 @@ import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.*
-import android.widget.TextView.OnEditorActionListener
-import androidx.annotation.RequiresApi
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -26,8 +25,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
-import java.lang.Exception
-import com.rishav.hvantage.MapsActivity as MapsActivity1
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -35,7 +32,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
@@ -61,23 +57,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapLoading: ProgressBar = findViewById(R.id.mapLoading)
         val currentLocationButton: ImageButton = findViewById(R.id.currentLocationButton)
         val searchText: EditText = findViewById(R.id.mapSearchText)
+        val getWeatherButton: Button = findViewById(R.id.getWeatherButton)
 
-        fetchLocation(mapLoading)
-        getSearchData(searchText)
+        fetchLocation(mapLoading, getWeatherButton)
+        getSearchData(searchText, getWeatherButton)
 
-        currentLocationButton.setOnClickListener { fetchLocation(mapLoading) }
+        currentLocationButton.setOnClickListener { fetchLocation(mapLoading, getWeatherButton) }
     }
 
-    private fun getSearchData(searchText: EditText) {
+    private fun getSearchData(searchText: EditText, weatherButton: Button) {
         searchText.setOnEditorActionListener { textView, actionId, keyEvent ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                geoLocate(searchText)
+                geoLocate(searchText, weatherButton)
             }
             false
         }
     }
 
-    private fun geoLocate(searchText: EditText) {
+    private fun geoLocate(searchText: EditText, weatherButton: Button) {
         val searchString: String = searchText.text.toString()
 
         val geocoder: Geocoder = Geocoder(this)
@@ -90,13 +87,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         if (list.isNotEmpty()) {
             val address: Address = list[0]
-
             moveCamera(LatLng(address.latitude, address.longitude), 16F)
+            navigateToWeather(weatherButton, address.latitude, address.longitude)
         }
     }
 
-    private fun fetchLocation(mapLoading: ProgressBar) {
-        mapLoading.visibility = View.VISIBLE
+    private fun fetchLocation(mapLoading: ProgressBar, weatherButton: Button) {
+
         val task: Task<Location> = fusedLocationClient.lastLocation
 
         if (ActivityCompat.checkSelfPermission(
@@ -120,6 +117,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 mapLoading.visibility = View.INVISIBLE
                 val currentLocation = LatLng(it.latitude, it.longitude)
                 moveCamera(currentLocation, 16.0f)
+
+                navigateToWeather(weatherButton, it.latitude, it.longitude)
             } else {
                 startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
             }
@@ -127,7 +126,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun moveCamera(latLng: LatLng, zoom: Float) {
+        mMap.clear()
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
         mMap.addMarker(MarkerOptions().position(latLng).title("Current Location"))
+    }
+
+    private fun navigateToWeather(weatherButton: Button, lat: Double, long: Double) {
+        weatherButton.setOnClickListener {
+            val intent: Intent = Intent(this, WeatherActivity::class.java)
+            intent.putExtra("lat", lat)
+            intent.putExtra("long", long)
+            startActivity(intent)
+        }
     }
 }
