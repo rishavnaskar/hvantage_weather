@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MapsActivity" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/white_border"
+        android:elevation="10dp">
+
+        <ImageView
+            android:id="@+id/mapSearchImage"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@color/black"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_baseline_search_24" />
+
+        <EditText
+            android:id="@+id/mapSearchText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/mapSearchImage"
+            android:background="@null"
+            android:hint="@string/search_address_city_zipcode"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:textColor="@color/white"
+            android:textColorHint="@color/grey"
+            android:textSize="15sp" />
+
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/mapLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/white"
+        android:minWidth="60dp"
+        android:minHeight="60dp"
+        tools:targetApi="lollipop" />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="30dp"
+        app:cardCornerRadius="7dp">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/currentLocationButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_baseline_my_location_24" />
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>
